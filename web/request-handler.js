@@ -8,27 +8,22 @@ var fs = require('fs');
 exports.handleRequest = function (req, res) {
   statusCode = 200;
     // console.log('this is the req method:', req.method)
-
-// http.get('./public/index.html', function (err, res) {
-//   if (err) {
-//     console.error(err);
-//     return;
-//   }
-  
-//   console.log(res.code, res.headers);
-// });
-
+   
    //an option 
    if(req.method === 'GET') {
+        res.writeHead(statusCode, {'Content-type': 'text/hmtl'});
       // console.log('req url: ', req.url)
       if(req.url === '/'){
-        res.writeHead(statusCode, {'Content-type': 'text/hmtl'});
-        fs.readFile('./public/index.html', function (err, html){
-          console.log('html and err:', html, err)
+        fs.readFile('web/public/index.html', 'UTF-8', function (err, html){
+          if(err){
+            console.log('error in get /:', err);
+          }
+          res.writeHead(200, {"Content-type": "text/html"});
+          res.end(html)
         }); 
-        res.end('<input>')
       } else  {
-        console.log('else')
+        res.writeHead(404, {"Content-type": "text/html"});
+        res.end("404 file not found");
       }
    }
 
