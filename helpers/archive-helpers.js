@@ -26,15 +26,21 @@ exports.initialize = function(pathsObj){
 // modularize your code. Keep it clean!
 
 exports.readListOfUrls = function(){
+  //create an empty array to store the urls
+  var urlList = [];
+
+  fs.re
 };
 
 exports.isUrlInList = function(){
+  //return boolean
 };
 
 exports.addUrlToList = function(){
 };
 
 exports.isUrlArchived = function(){
+  //return boolean
 };
 
 exports.downloadUrls = function(){
