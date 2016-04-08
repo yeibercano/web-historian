@@ -1,5 +1,6 @@
 var fs = require('fs');
 var path = require('path');
+var request = require('request');
 var _ = require('underscore');
 
 /*
@@ -22,26 +23,56 @@ exports.initialize = function(pathsObj){
   });
 };
 
-// The following function names are provided to you to suggest how you might
-// modularize your code. Keep it clean!
 
-exports.readListOfUrls = function(){
-  //create an empty array to store the urls
-  var urlList = [];
-
-  fs.re
+exports.readListOfUrls = function(callback){
+  fs.readFile(exports.paths.list, function(err, sites) {
+    sites = sites.toString().split('\n');
+    if( callback ){
+      callback(sites);
+    }
+  });
 };
 
-exports.isUrlInList = function(){
-  //return boolean
+exports.isUrlInList = function(url, callback){
+  exports.readListOfUrls(function(sites) {
+    var found = _.any(sites, function(site, i) {
+      return site.match(url);
+    });
+    callback(found);
+  });
 };
 
-exports.addUrlToList = function(){
+exports.addUrlToList = function(url, callback){
+  fs.appendFile(exports.paths.list, url + '\n', function(err, file){
+    callback();
+  });
 };
 
-exports.isUrlArchived = function(){
-  //return boolean
+exports.isUrlArchived = function(url, callback){
+    url = url.slice(1); // ugly hack
+    url = url.slice(0, url.length-1); // ugly hack 
+  var sitePath = path.join(exports.paths.archivedSites, url);
+
+  fs.exists(sitePath, function(exists) {
+    callback(exists);
+  
+  });
 };
 
-exports.downloadUrls = function(){
+exports.downloadUrls = function(urls){
+  // Iterate over urls and pipe to new files
+
+  if(typeof urls === 'string'){ //hack
+    var temp = urls; //hack
+    urls = []; //hack
+    urls.push(temp); //hack
+  }
+  _.each(urls, function (url) {
+    url = url.slice(1); // ugly hack
+    url = url.slice(0, url.length-1); // ugly hack   
+    
+    if (!url) { return; }
+    
+    request('http://' + url).pipe(fs.createWriteStream(exports.paths.archivedSites + "/" + url));
+  });
 };
